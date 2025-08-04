@@ -118,9 +118,21 @@ if st.button("🔍 Calculate Total Cost"):
     df = pd.DataFrame(data)
     df["Unit Rate"] = df["Pos"].apply(lambda x: rate_options.get(x, 0))
     df["Cost (USD)"] = df["Time"] * df["Unit Rate"]
-
-    st.markdown("#### 📊 Calculation Result")
-    st.table(df[["Pos", "Description", "Unit", "Time", "Unit Rate", "Cost (USD)"]])
     total_cost = df["Cost (USD)"].sum()
-    st.markdown(f"**💰 Total Cost: ${total_cost:,.2f}**")
-    st.markdown(f"**📝 Scope of Work Summary:** {scope if scope else 'No scope provided.'}")
+
+    # HTML 테이블 생성
+    table_html = df.to_html(index=False, border=1, justify='center')
+
+    # Scope 줄바꿈 처리 (Outlook 대응용)
+    scope_html = scope.replace("\n", "<br>")
+
+    # 최종 출력 HTML
+    result_html = f"""
+    <h4>📊 Calculation Result</h4>
+    {table_html}
+    <p><b>💰 Total Estimated Cost:</b> ${total_cost:,.2f}</p>
+    <p><b>📝 Scope of Work Summary:</b><br>{scope_html if scope else 'No scope provided.'}</p>
+    """
+
+    # 표시
+    st.markdown(result_html, unsafe_allow_html=True)
